@@ -1,0 +1,52 @@
+name: Weekly Site Optimization
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday 9am UTC
+  workflow_dispatch:      # Manual trigger anytime
+
+jobs:
+  optimize:
+    name: Claude Code Optimization Session
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic/claude-code
+
+      - name: Run optimization session
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          claude --dangerously-skip-permissions -p "
+            Read CLAUDE.md first. Follow every step in order.
+            You are running as an automated optimization agent.
+            No human is present. Act autonomously.
+            When done, create a PR with your changes and update site-audit-log.md.
+          "
+
+      - name: Upload session log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimization-session-${{ github.run_number }}
+          path: site-audit-log.md
+          retention-days: 30
