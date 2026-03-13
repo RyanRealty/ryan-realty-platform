@@ -1,13 +1,16 @@
 @import "./styles/tokens.css";
 @import "tailwindcss";
+
 @theme inline {
   --color-background: var(--color-bg-canvas);
   --color-foreground: var(--color-text-primary);
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
 }
+
 body {
   background: var(--color-bg-canvas);
   color: var(--color-text-primary);
   font-family: var(--font-body);
 }
+
